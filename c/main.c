@@ -15,6 +15,7 @@ void calc( char *str );
 token *parse( char *str );
 token *token__new( token *prev, tokenType type );
 void token__dumpChain( token *head );
+void token__freeChain( token *head );
 
 int main( int argc, char *argv[] ) {
     calc( "2+4-(1.4-3)" ); // should be 7.6
@@ -23,6 +24,7 @@ int main( int argc, char *argv[] ) {
 void calc( char *str ) {
     token *head = parse( str );
     token__dumpChain( head );
+    token__freeChain( head );
 }
 
 token *parse( char *str ) {
@@ -114,8 +116,17 @@ void token__dumpChain( token *head ) {
     }
 }
 
+void token__freeChain( token *head ) {
+    token *cur = head;
+    while( cur ) {
+        token *next = cur->next;
+        free( cur );
+        cur = next;
+    }
+}
+
 token *token__new( token *cur, tokenType type ) {
-    token *tok = ( token * ) calloc( sizeof( token ), 1 );
+    token *tok = ( token * ) calloc( 1, sizeof( token ) );
     if( cur ) {
         cur->next = tok;
         tok->prev = cur;
